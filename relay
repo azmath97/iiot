@@ -1,0 +1,45 @@
+import RPi.GPIO as gpio
+import time
+
+relay = [31, 33, 35, 37]
+servo = 11
+
+gpio.setmode(gpio.BOARD)
+gpio.setwarnings(False)
+
+for pin in relay:
+    gpio.setup(pin, gpio.OUT)
+
+gpio.setup(servo, gpio.OUT)
+
+pwm = gpio.PWM(servo, 50)
+pwm.start(0)
+
+def set_angle(angle):
+    pwm.ChangeDutyCycle(2 + angle / 18)
+    time.sleep(0.5)
+    pwm.ChangeDutyCycle(0)
+
+try:
+    while True:
+        for pin in relay:
+            gpio.output(pin, 1)
+        print("Relay ON")
+
+        for angle in [0, 90, 180]:
+            print(f"Moving to {angle}°")
+            set_angle(angle)
+            time.sleep(1)
+
+        for pin in relay:
+            gpio.output(pin, 0)
+        print("Relay OFF")
+
+        time.sleep(3)
+
+except KeyboardInterrupt:
+    print("Stopping Program")
+
+finally:
+    pwm.stop()
+    gpio.cleanup()
