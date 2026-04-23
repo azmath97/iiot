@@ -1,0 +1,33 @@
+import RPi.GPIO as GPIO
+import time
+
+gas = 35
+relay = 40
+
+def setup():
+    GPIO.setmode(GPIO.BOARD)
+    GPIO.setup(gas, GPIO.IN)
+    GPIO.setup(relay, GPIO.OUT)
+
+def read_gas():
+    while True:
+        gas_state = GPIO.input(gas)
+        if gas_state == 0:
+            print("Gas detected")
+            print("Relay ON")
+            GPIO.output(relay, True)
+        else:
+            print("Gas NOT detected")
+            print("Relay OFF")
+            GPIO.output(relay, False)
+        time.sleep(0.3)
+
+def destroy():
+    GPIO.cleanup()
+
+if __name__ == "__main__":
+    try:
+        setup()
+        read_gas()
+    except KeyboardInterrupt:
+        destroy()
