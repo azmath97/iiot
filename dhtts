@@ -1,0 +1,35 @@
+import Adafruit_DHT
+import RPi.GPIO as gpio
+import time
+from urllib.request import urlopen
+
+gpio.setmode(gpio.BCM)
+gpio.setwarnings(False)
+
+WRITE_API = "N597C36WFDUEZ7WW"
+BASE_URL = "https://api.thingspeak.com/update?api_key={}".format(WRITE_API)
+
+sensor = Adafruit_DHT.DHT11
+pin = 17
+
+while(1):
+    try:
+        humidity, temp = Adafruit_DHT.read_retry(sensor, pin)
+        print("Humidity=" + str(humidity))
+        print("Temperature=" + str(temp))
+
+        thingspeakHttp = BASE_URL + "&field1={:.2f}&field2={:.2f}".format(temp, humidity)
+        print(thingspeakHttp)
+
+        conn = urlopen(thingspeakHttp)
+        conn.close()
+
+        time.sleep(1)
+
+    except ValueError:
+        print("Unable to read data")
+
+    except KeyboardInterrupt:
+        print("stopped")
+        gpio.cleanup()
+        break
