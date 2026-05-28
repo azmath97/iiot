@@ -1,45 +1,67 @@
-import RPi.GPIO as gpio
+import RPi.GPIO as GPIO
 import time
 
-relay = [31, 33, 35, 37]
-servo = 11
+relay_pins=[31,33,35,37]
 
-gpio.setmode(gpio.BOARD)
-gpio.setwarnings(False)
+servo_pin=23
 
-for pin in relay:
-    gpio.setup(pin, gpio.OUT)
+GPIO.setmode(GPIO.BOARD)
+GPIO.setwarnings(False)
 
-gpio.setup(servo, gpio.OUT)
+GPIO.setup(relay_pins,GPIO.OUT)
+GPIO.setup(servo_pin,GPIO.OUT)
 
-pwm = gpio.PWM(servo, 50)
-pwm.start(0)
+servo=GPIO.PWM(servo_pin,50)
+
+servo.start(0)
 
 def set_angle(angle):
-    pwm.ChangeDutyCycle(2 + angle / 18)
+
+    duty=2+(angle/18)
+
+    servo.ChangeDutyCycle(duty)
+
     time.sleep(0.5)
-    pwm.ChangeDutyCycle(0)
+
+    servo.ChangeDutyCycle(0)
 
 try:
+
     while True:
-        for pin in relay:
-            gpio.output(pin, 1)
+
+        GPIO.output(relay_pins,GPIO.HIGH)
+
         print("Relay ON")
 
-        for angle in [0, 90, 180]:
-            print(f"Moving to {angle}°")
-            set_angle(angle)
-            time.sleep(1)
+        time.sleep(1)
 
-        for pin in relay:
-            gpio.output(pin, 0)
+        print("Moving to 0 Degrees")
+
+        set_angle(0)
+
+        time.sleep(1)
+
+        print("Moving to 90 Degrees")
+        set_angle(90)
+        time.sleep(1)
+        print("Moving to 180 Degrees")
+
+        set_angle(180)
+
+        time.sleep(1)
+
+        GPIO.output(relay_pins,GPIO.LOW)
+
         print("Relay OFF")
 
         time.sleep(3)
 
 except KeyboardInterrupt:
-    print("Stopping Program")
+
+    print("Stopping Program...")
 
 finally:
-    pwm.stop()
-    gpio.cleanup()
+
+    servo.stop()
+
+    GPIO.cleanup()
