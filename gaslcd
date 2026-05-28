@@ -1,30 +1,48 @@
-import RPi.GPIO as g
-from time import sleep as s
+# Gas Sensor with LCD
+
+import RPi.GPIO as GPIO
+from time import sleep
 from RPLCD.gpio import CharLCD
 
-g.setwarnings(False)
-g.setmode(g.BOARD)
+GPIO.setmode(GPIO.BOARD)
+GPIO.setwarnings(False)
 
-G = 36
-g.setup(G, g.IN)
+GAS_SENSOR=31
 
-lcd = CharLCD(cols=20, rows=2, pin_rs=7, pin_e=11, pins_data=[40, 38, 36, 32], numbering_mode=g.BOARD)
+GPIO.setup(GAS_SENSOR,GPIO.IN)
 
-s(5)
+lcd=CharLCD(
+rows=2,
+cols=20,
+pin_rs=7,
+pin_e=11,
+pins_data=[40,38,36,32],
+numbering_mode=GPIO.BOARD
+)
+
+previous_state=None
 
 try:
-    ls = None
     while True:
-        st = g.input(G)
-        if st != ls:
+
+        state=GPIO.input(GAS_SENSOR)
+
+        if state!=previous_state:
+
             lcd.clear()
-            lcd.cursor_pos = (0, 0)
-            if st == 0:
-                lcd.write_string("WARNING: GAS LEAK!")
+
+            lcd.cursor_pos=(0,0)
+
+            if state==0:
+                lcd.write_string("Warning: Gas Leak")
             else:
-                lcd.write_string("No Gas")
-            ls = st
-        s(2)
+                lcd.write_string("No Gas Detected")
+
+            previous_state=state
+
+        sleep(1)
+
 except KeyboardInterrupt:
+
     lcd.clear()
-    g.cleanup()
+    GPIO.cleanup()
