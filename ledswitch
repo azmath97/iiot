@@ -1,0 +1,19 @@
+import RPi.GPIO as GPIO
+import time
+
+GPIO.setmode(GPIO.BOARD)
+GPIO.setwarnings(False)
+
+GPIO.setup(18, GPIO.OUT)
+GPIO.setup(16, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
+while True:
+    if GPIO.input(16) == GPIO.HIGH:
+        print("Switch ON - LED ON")
+        GPIO.output(18, GPIO.HIGH)
+
+    else:
+        print("Switch OFF - LED OFF")
+        GPIO.output(18, GPIO.LOW)
+
+    time.sleep(1)
