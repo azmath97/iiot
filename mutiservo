@@ -9,7 +9,7 @@ GPIO.setup(11, GPIO.OUT)
 
 servo = GPIO.PWM(11, 50)
 
-servo.start(0)
+servo.start(0)\
 
 def set_angle(angle):
 
